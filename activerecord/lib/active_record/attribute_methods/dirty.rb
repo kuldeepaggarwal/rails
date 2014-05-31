@@ -94,13 +94,12 @@ module ActiveRecord
       end
 
       def _field_changed?(attr, old, value)
-        if column = column_for_attribute(attr)
-          if column.number? && (changes_from_nil_to_empty_string?(column, old, value) ||
-                                changes_from_zero_to_string?(old, value))
-            value = nil
-          else
-            value = column.type_cast(value)
-          end
+        column = column_for_attribute(attr)
+        if column.number? && (changes_from_nil_to_empty_string?(column, old, value) ||
+                              changes_from_zero_to_string?(old, value))
+          value = nil
+        else
+          value = column.type_cast(value)
         end
 
         old != value

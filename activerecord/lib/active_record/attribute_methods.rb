@@ -355,10 +355,10 @@ module ActiveRecord
     #   # => #<ActiveRecord::ConnectionAdapters::SQLite3Column:0x007ff4ab083980 @name="name", @sql_type="varchar(255)", @null=true, ...>
     #
     #   person.column_for_attribute(:nothing)
-    #   # => nil
+    #   # => <ActiveRecord::ConnectionAdapters::NullColumn:0x00000101547728 @name="nothing", @cast_type=#<ActiveRecord::Type::Value:0x00000101547700, ...>
     def column_for_attribute(name)
-      # FIXME: should this return a null object for columns that don't exist?
-      self.class.columns_hash[name.to_s]
+      name = name.to_s
+      self.class.columns_hash[name] || ConnectionAdapters::NullColumn.new(name)
     end
 
     # Returns the value of the attribute identified by <tt>attr_name</tt> after it has been typecast (for example,
@@ -443,16 +443,14 @@ module ActiveRecord
 
     # Filters the primary keys and readonly attributes from the attribute names.
     def attributes_for_update(attribute_names)
-      attribute_names.select do |name|
-        column_for_attribute(name) && !readonly_attribute?(name)
-      end
+      attribute_names.select { |name| !readonly_attribute?(name) }
     end
 
     # Filters out the primary keys, from the attribute names, when the primary
     # key is to be generated (e.g. the id attribute has no value).
     def attributes_for_create(attribute_names)
       attribute_names.select do |name|
-        column_for_attribute(name) && !(pk_attribute?(name) && id.nil?)
+        !pk_attribute?(name) || !id.nil?
       end
     end
 

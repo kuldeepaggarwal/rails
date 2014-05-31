@@ -80,6 +80,11 @@ class ReflectionTest < ActiveRecord::TestCase
     assert_equal :integer, @first.column_for_attribute("id").type
   end
 
+  def test_non_existent_columns_return_null_column_object
+    column = @first.column_for_attribute(:non_existing_column)
+    assert_equal column.class, ActiveRecord::ConnectionAdapters::NullColumn
+  end
+
   def test_reflection_klass_for_nested_class_name
     reflection = MacroReflection.new(:company, nil, nil, { :class_name => 'MyApplication::Business::Company' }, ActiveRecord::Base)
     assert_nothing_raised do

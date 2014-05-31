@@ -74,14 +74,10 @@ module ActiveRecord
 
         # If we're dealing with a binary column, write the data to the cache
         # so we don't attempt to typecast multiple times.
-        if column && column.binary?
-          @attributes[attr_name] = value
-        end
+        @attributes[attr_name] = value if column.binary?
 
-        if column
+        if self.class.columns_hash[attr_name] || @raw_attributes.has_key?(attr_name)
           @raw_attributes[attr_name] = column.public_send(type_cast_method, value)
-        elsif @raw_attributes.has_key?(attr_name)
-          @raw_attributes[attr_name] = value
         else
           raise ActiveModel::MissingAttributeError, "can't write unknown attribute `#{attr_name}'"
         end
