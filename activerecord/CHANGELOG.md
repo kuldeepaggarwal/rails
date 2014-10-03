@@ -1,3 +1,8 @@
+*   Added ActiveRecord::SecureToken to encapsulate generation of unique value for
+    an attribute of a model with `SecureRandom`.
+
+    *Kuldeep Aggarwal*
+
 *   Honor overridden `rack.test` in Rack environment for the connection
     management middleware.
 
